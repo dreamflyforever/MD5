@@ -7,7 +7,36 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
- 
+
+
+void reverse(char s[])
+{
+	int i, j;
+	char c;
+
+	for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
+} 
+/* itoa:  convert n to characters in s */
+void itoa(int n, char s[])
+{
+	int i, sign;
+
+	if ((sign = n) < 0)  /* record sign */
+		n = -n;/* make n positive */
+	i = 0;
+	do {       /* generate digits in reverse order */
+		s[i++] = n % 10 + '0';   /* get next digit */
+	} while ((n /= 10) > 0);     /* delete it */
+	if (sign < 0)
+		s[i++] = '-';
+	s[i] = '\0';
+	reverse(s);
+}
+
 // Constants are the integer part of the sines of integers (in radians) * 2^32.
 const uint32_t k[64] = {
 0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee ,
@@ -147,28 +176,33 @@ void md5(const uint8_t *initial_msg, size_t initial_len, uint8_t *digest) {
 }
  
 int main(int argc, char **argv) {
-    char *msg;
-    size_t len;
-    int i;
-    uint8_t result[16];
- 
-    if (argc < 2) {
-        printf("usage: %s 'string'\n", argv[0]);
-        return 1;
-    }
-    msg = argv[1];
- 
-    len = strlen(msg);
- 
-    // benchmark
-    for (i = 0; i < 1000000; i++) {
-        md5((uint8_t*)msg, len, result);
-    }
- 
-    // display result
-    for (i = 0; i < 16; i++)
-        printf("%2.2x", result[i]);
-    puts("");
- 
-    return 0;
+	char *msg;
+	size_t len;
+	int i;
+	uint8_t result[16];
+
+	if (argc < 2) {
+		printf("usage: %s 'string'\n", argv[0]);
+		return 1;
+	}
+	msg = argv[1];
+
+	len = strlen(msg);
+
+	// benchmark
+	//for (i = 0; i < 1000000; i++) {
+	md5((uint8_t*)msg, len, result);
+	//}
+
+	// display result
+	char str[33] = {0};
+	char tmp[2] = {0};
+	for (i = 0; i < 16; i++) {
+		printf("%2.2x", result[i]);
+		snprintf(&(str[i*2]), 3, "%2.2x", result[i]);
+	}
+	puts("");
+
+	printf("[%s %d]str: %s\n", __func__, __LINE__, str);
+	return 0;
 }
